@@ -1,0 +1,6 @@
+quarkus-service:
+  serviceMesh:
+    transcoder:
+      enabled: true
+      services: []
+      encodedProtoBin: ""

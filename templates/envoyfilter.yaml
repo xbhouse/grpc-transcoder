@@ -1,0 +1,41 @@
+{{- if (.Values.serviceMesh.transcoder.enabled) }}
+apiVersion: networking.istio.io/v1alpha3
+kind: EnvoyFilter
+metadata:
+  name: grpc-json-transcoder
+spec:
+  workloadSelector:
+    labels:
+      app.kubernetes.io/instance: {{ include "quarkus-service.fullname" . }}
+      app.kubernetes.io/name: {{ include "quarkus-service.name" . }}
+  priority: 10
+  configPatches:
+    - applyTo: HTTP_FILTER
+      match:
+        context: SIDECAR_INBOUND
+        listener:
+          filterChain:
+            filter:
+              name: envoy.filters.network.http_connection_manager
+              subFilter:
+                name: envoy.filters.http.router
+          portNumber: 9000 # application port
+          portName: grpc
+      patch:
+        operation: INSERT_BEFORE
+        value:
+          name: envoy.filters.http.grpc_json_transcoder
+          typed_config:
+            "@type": type.googleapis.com/envoy.extensions.filters.http.grpc_json_transcoder.v3.GrpcJsonTranscoder
+            services:
+            {{- range .Values.serviceMesh.transcoder.services }}
+            - {{ toYaml . | quote }}
+            {{- end }}
+            print_options:
+              add_whitespace: true
+              always_print_enums_as_ints: false
+              always_print_primitive_fields: true
+              preserve_proto_field_names: false
+            convert_grpc_status: true
+            proto_descriptor_bin: {{ .Values.serviceMesh.transcoder.encodedProtoBin }}
+  {{- end }}
