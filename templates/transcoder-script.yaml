@@ -1,9 +1,9 @@
 # task to perform if serviceMesh transcoder is enabled
 if [ $(params.TRANSCODER_ENABLED) == 'true' ]
 then
-  ### Clone source repo (this can be any repo, using hello world as example)
-  git clone https://github.com/xbhouse/grpc-quarkus-sample
-  export APPLICATION=grpc-quarkus-sample
+  ### Clone source repo (this can be any repo, using my hello world as example)
+  git clone https://github.com/xbhouse/grpc-quarkus-transcoder
+  export APPLICATION=grpc-quarkus-transcoder
   
   ### Show current state of values.yaml
   echo "Current state of values.yaml.."
